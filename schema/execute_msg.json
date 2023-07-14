@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExecuteMsg",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "poker"
+      ],
+      "properties": {
+        "poker": {
+          "type": "object",
+          "required": [
+            "board",
+            "user_hands"
+          ],
+          "properties": {
+            "board": {
+              "type": "string"
+            },
+            "user_hands": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}
