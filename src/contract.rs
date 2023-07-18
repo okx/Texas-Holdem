@@ -86,7 +86,7 @@ fn try_call_to_poker(
         .add_attribute("winner", winner.to_string())
         .add_attribute("cards", winner_cards.to_string())
         .add_attribute("hands", winner_hands)
-        .set_data(winner.to_be_bytes()))
+        .set_data(winner.to_string().as_bytes()))
 }
 
 fn get_best_eval_with_hands_board(hands: &String, board: &String) -> Result<Eval, ContractError> {
