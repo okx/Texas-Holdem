@@ -33,7 +33,7 @@ schemars = "0.8.1"
 serde = { version = "1.0.125", default-features = false, features = ["derive"] }
 hex = "0.4"
 thiserror = "1.0.23"
-poker = { version = "0.5", default-features = false }
+poker = { path = "./packages/poker",version = "0.5", default-features = false, features = ["static_lookup"] }
 
 [dev-dependencies]
 cosmwasm-vm = "1.0.0-beta"

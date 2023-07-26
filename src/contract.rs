@@ -7,7 +7,7 @@ use cosmwasm_storage::PrefixedStorage;
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::Constants;
-use poker::{box_cards, cards, Card, Eval, Evaluator};
+use poker::{box_cards, cards, evaluate::static_lookup, Card, Eval};
 
 pub const PREFIX_CONFIG: &[u8] = b"config";
 
@@ -90,7 +90,7 @@ fn try_call_to_poker(
 }
 
 fn get_best_eval_with_hands_board(hands: &String, board: &String) -> Result<Eval, ContractError> {
-    let eval = Evaluator::new();
+    // let eval = Evaluator::new();
     let board: Vec<Card> = match cards!(board.as_str()).try_collect() {
         Ok(cards) => cards,
         Err(_) => {
@@ -109,7 +109,7 @@ fn get_best_eval_with_hands_board(hands: &String, board: &String) -> Result<Eval
         }
     };
 
-    let result = match eval.evaluate(box_cards!(board, hands)) {
+    let result = match static_lookup::evaluate(box_cards!(board, hands)) {
         Ok(e) => e,
         Err(_) => {
             return Err(ContractError::GetWinnerFaiile(
@@ -164,15 +164,16 @@ mod tests {
             // Set approval
             let poker_msg = ExecuteMsg::Poker {
                 user_hands: vec![
-                    "Kc 4c".to_string(),
-                    "3s 3h".to_string(),
-                    "5s 5h".to_string(),
-                    "Tc Ac".to_string(),
-                    "3d Ah".to_string(),
-                    "Th Ad".to_string(),
-                    "Kh Th".to_string(),
-                    "2s 2c".to_string(),
-                    "7c 6c".to_string(),
+                    "Js Qd".to_string(),
+                    "4h 5s".to_string(),
+                    "2c 3h".to_string(),
+                    "Js Qd".to_string(),
+                    "Kd Ac".to_string(),
+                    "Ah 2s".to_string(),
+                    "6c 7h".to_string(),
+                    "7c 8h".to_string(),
+                    "2s 3d".to_string(),
+                    "7d 8c".to_string(),
                 ],
                 board: "3c 5c As Jc Qh".to_string(),
             };
