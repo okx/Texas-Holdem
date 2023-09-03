@@ -13,6 +13,11 @@ pub enum ExecuteMsg {
         user_hands: Vec<String>, // user hands poker which number is two
         board: String,           // the board poker whichi numbe is five
     },
+    PokerMulti {
+        user_hands: Vec<String>, // user hands poker which number is two
+        board: String,           // the board poker whichi numbe is five
+        num: u64,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

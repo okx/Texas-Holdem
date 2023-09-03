@@ -40,7 +40,14 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::Poker { user_hands, board } => try_call_to_poker(deps, env, user_hands, board),
+        ExecuteMsg::Poker { user_hands, board } => {
+            try_call_to_poker(deps, env, user_hands, board, 1_u64)
+        }
+        ExecuteMsg::PokerMulti {
+            user_hands,
+            board,
+            num,
+        } => try_call_to_poker(deps, env, user_hands, board, num),
     }
 }
 
@@ -56,37 +63,48 @@ fn try_call_to_poker(
     _env: Env,
     user_hands: Vec<String>,
     board: String,
+    num: u64,
 ) -> Result<Response, ContractError> {
     if user_hands.len() < 1 {
         return Err(ContractError::GetWinnerFaiile(
             "the number of user_hands is one at least ".to_string(),
         ));
     }
+    let mut response_winner = 0_u128;
+    let mut response_cards = "default".to_string();
+    let mut response_hands = "default";
+    let mut response_data = "default".to_string();
+    for i in 1..num {
+        let mut winner = 0_u128;
+        let mut winner_cards: Eval = get_best_eval_with_hands_board(&user_hands[0], &board)?;
 
-    let mut winner = 0_u128;
-    let mut winner_cards: Eval = get_best_eval_with_hands_board(&user_hands[0], &board)?;
-
-    let mut index = 1_u128;
-    for iter in user_hands.iter().skip(1) {
-        let current_cars = get_best_eval_with_hands_board(iter, &board)?;
-        if current_cars.is_better_than(winner_cards.clone()) {
-            winner_cards = current_cars;
-            winner = index;
+        let mut index = 1_u128;
+        for iter in user_hands.iter().skip(1) {
+            let current_cars = get_best_eval_with_hands_board(iter, &board)?;
+            if current_cars.is_better_than(winner_cards.clone()) {
+                winner_cards = current_cars;
+                winner = index;
+            }
+            index = index + 1;
         }
-        index = index + 1;
+
+        let winner_hands = match user_hands.get(winner as usize) {
+            Some(s) => s,
+            None => {
+                return Err(ContractError::GetWinnerFaiile("unknown error".to_string()));
+            }
+        };
+        response_winner = winner;
+        response_cards = winner_cards.clone().to_string();
+        response_hands = winner_hands.as_str();
+        response_data = winner.to_string();
     }
 
-    let winner_hands = match user_hands.get(winner as usize) {
-        Some(s) => s,
-        None => {
-            return Err(ContractError::GetWinnerFaiile("unknown error".to_string()));
-        }
-    };
     Ok(Response::new()
-        .add_attribute("winner", winner.to_string())
-        .add_attribute("cards", winner_cards.to_string())
-        .add_attribute("hands", winner_hands)
-        .set_data(winner.to_string().as_bytes()))
+        .add_attribute("winner", response_winner.to_string())
+        .add_attribute("cards", response_cards.to_string())
+        .add_attribute("hands", response_hands.to_string())
+        .set_data(response_data.to_string().as_bytes()))
 }
 
 fn get_best_eval_with_hands_board(hands: &String, board: &String) -> Result<Eval, ContractError> {

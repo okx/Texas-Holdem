@@ -28,6 +28,39 @@
         }
       },
       "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "poker_multi"
+      ],
+      "properties": {
+        "poker_multi": {
+          "type": "object",
+          "required": [
+            "board",
+            "num",
+            "user_hands"
+          ],
+          "properties": {
+            "board": {
+              "type": "string"
+            },
+            "num": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "user_hands": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
     }
   ]
 }
